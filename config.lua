@@ -365,7 +365,6 @@ AddSpell( 31842 ,{ name = "Divine Favor",duration = 20, short = "Favor" })
 AddSpell( 20066 ,{ name = "Repentance",duration = 60, pvpduration = 8 })
 AddSpell( 853 ,{ name = "Hammer of Justice",duration = 6, short = "HoJ", color = colors.FROZEN })
 --AddSpell( 31803 ,{ name = "Censure",duration = 15, color = colors.RED})
-AddSpell( 85696 ,{ name = "Zealotry",duration = 20 })
 
 AddCooldown( 35395 ,{ name = "Crusader Strike", color = colors.RED })
 AddCooldown( 20925 ,{ name = "Holy Shield", color = colors.RED })
