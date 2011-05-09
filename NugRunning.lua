@@ -113,6 +113,7 @@ end
 function NugRunning.COMBAT_LOG_EVENT_UNFILTERED( self, event, timestamp, eventType, hideCaster,
                 srcGUID, srcName, srcFlags, --srcFlags2,
                 dstGUID, dstName, dstFlags, --dstFlags2,
+				spellID, spellName, spellSchool, auraType, amount)
     if NugRunningConfig[spellID] then
         local isSrcPlayer = (bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE)
         local opts = NugRunningConfig[spellID]
