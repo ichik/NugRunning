@@ -43,7 +43,7 @@ local colors = {
     CHILL = { 0.6, 0.6, 1},
     BLACK = {0.4,0.4,0.4},
     WOO = {151/255, 86/255, 168/255},
-    WOO2 = {80/255, 83/255, 150/255},
+	WOO2 = {80/255, 83/255, 150/255},
 }
 NugRunningConfig.colors = colors
 
@@ -54,6 +54,8 @@ local stackingTrinkets = false
 if useTrinkets then
     AddSpell({ 33702,33697,20572 },{ name = "Blood Fury", duration = 15 }) --Orc Racial
     AddSpell( 26297 ,{ name = "Berserking", duration = 10 }) --Troll Racial
+	AddSpell({ 54861 },{ name = "Nitro", duration = 5 })
+	AddSpell({ 91376 },{ name = "Mark", duration = 15 })
 end
 if procTrinkets then
     --AddSpell( 60437 ,{ name = "Grim Toll", duration = 10 })
@@ -119,7 +121,7 @@ end
 if class == "PRIEST" then
 -- BUFFS
 AddSpell( 139 ,{ name = "Renew", shinerefresh = true, color = colors.LGREEN, duration = 15 })
-AddSpell( 17 ,{ name = "Power Word: Shield", shinerefresh = true, duration = 30, color = colors.LRED, short = "PW:S" })
+AddSpell( 17 ,{ name = "Power Word: Shield", shinerefresh = true, duration = 15, color = colors.LRED, short = "PW:S" })
 AddSpell( 41635 ,{ name = "Prayer of Mending", shinerefresh = true, duration = 30, color = colors.RED, textfunc = function(timer) return timer.dstName end })
 AddSpell( 88688 ,{ name = "Surge of Light",duration = 10 })
 AddSpell( 47788 ,{ name = "Guardian Spirit", shine = true, duration = 10, color = colors.LBLUE, short = "Guardian" })
@@ -170,7 +172,7 @@ AddSpell( 81661 ,{ name = "Evangelism",duration = 15, color = colors.ORANGE, sta
                             } })
 --AddSpell( 81700 ,{ name = "Archangel",duration = 18, color = colors.CURSE })
 
---AddSpell( 63731 ,{ name = "Serendipity",duration = 20, color = {0.4,0.4,0.9} })
+--AddSpell({ 63731,63735 } ,{ name = "Serendipity",duration = 20, color = {0.4,0.4,0.9} })
 end
 
 
@@ -346,14 +348,16 @@ end
 
 if class == "PALADIN" then
 
---AddSpell( 53657 ,{ name = "Judgements of the Pure", short = "JotP", duration = 100500, color = colors.LBLUE })
+AddSpell( 53657 ,{ name = "Judgements of the Pure", short = "JotP", duration = 100500, color = colors.LBLUE })
 AddSpell( 84963 ,{ name = "Inquisition",duration = 10, color = colors.PURPLE })  -- 10 * CP
 AddSpell( 31884 ,{ name = "Avenging Wrath",duration = 20, short = "AW" })
+AddSpell( 85696 ,{ name = "Zealotry",duration = 20 })
 AddSpell( 498 ,{ name = "Divine Protection",duration = 12, short = "DProt" })
 AddSpell( 642 ,{ name = "Divine Shield",duration = 12, short = "DShield" })
 AddSpell( 1022 ,{ name = "Hand of Protection",duration = 10, short = "HoProt" })
 AddSpell( 1044 ,{ name = "Hand of Freedom",duration = 6, short = "Freedom" })
 AddSpell( 10326 ,{ name = "Turn Evil",duration = 20, pvpduration = 8, color = colors.LGREEN })
+AddSpell( 96263 ,{ name = "Sacred Shield",duration = 15, short = "SShield" })
 
 AddSpell( 53563 ,{ name = "Beacon of Light",duration = 300, short = "Beacon",color = colors.RED })
 AddSpell( 54428 ,{ name = "Divine Plea",duration = 15, short = "Plea" })
@@ -361,7 +365,6 @@ AddSpell( 31842 ,{ name = "Divine Favor",duration = 20, short = "Favor" })
 AddSpell( 20066 ,{ name = "Repentance",duration = 60, pvpduration = 8 })
 AddSpell( 853 ,{ name = "Hammer of Justice",duration = 6, short = "HoJ", color = colors.FROZEN })
 --AddSpell( 31803 ,{ name = "Censure",duration = 15, color = colors.RED})
-AddSpell( 85696 ,{ name = "Zealotry",duration = 20 })
 
 AddCooldown( 35395 ,{ name = "Crusader Strike", color = colors.RED })
 AddCooldown( 20925 ,{ name = "Holy Shield", color = colors.RED })
@@ -373,9 +376,13 @@ AddCooldown( 20473 ,{ name = "Holy Shock", color = colors.PINK })
 
 --AddSpell( 94686 ,{ name = "Crusader", duration = 15 })
 AddSpell( 59578 ,{ name = "Exorcism", shine = true, color = colors.ORANGE, duration = 15 })
+AddSpell( 54149 ,{ name = "Infusion of Light", shine = true, color = colors.LGREEN, duration = 15, short = "Infusion" })
+AddSpell( 85509 ,{ name = "Exorcism", shine = true, color = colors.ORANGE, duration = 20 })
 --AddActivation( 879 ,{ name = "Exorcism", shine = true, color = colors.ORANGE, duration = 15 })
 --AddActivation( 84963 ,{ name = "Hand of Light", shine = true, showid = 85256, short = "Light", color = colors.PINK, duration = 8 })
+--AddActivation ( 20473 ,{ name = "Daybreak", shine = true, showid = 20473, color = colors.PINK, duration = 12 })
 AddSpell( 90174 ,{ name = "Hand of Light", shine = true, showid = 85256, short = "Light", color = colors.PINK, duration = 8 })
+AddSpell ( 88819 ,{ name = "Daybreak", shine = true, showid = 20473, color = colors.PINK, duration = 12 })
 
 AddSpell( 62124 ,{ name = "Taunt", duration = 3 })
 AddSpell( 85416 ,{ name = "Reset", shine = true, timeless = true, duration = 0.1, color = colors.BLACK })

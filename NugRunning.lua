@@ -54,16 +54,17 @@ function NugRunning.PLAYER_LOGIN(self,event,arg1)
     NRunDB.anchor.point = NRunDB.anchor.point or "CENTER"
     NRunDB.anchor.parent = NRunDB.anchor.parent or "UIParent"
     NRunDB.anchor.to = NRunDB.anchor.to or "CENTER"
-    NRunDB.anchor.x = NRunDB.anchor.x or 0
-    NRunDB.anchor.y = NRunDB.anchor.y or 0
+    NRunDB.anchor.x = NRunDB.anchor.x or -112.5
+    NRunDB.anchor.y = NRunDB.anchor.y or 268
     NRunDB.growth = NRunDB.growth or "up"
-    NRunDB.width = NRunDB.width or 150
-    NRunDB.height = NRunDB.height or 20
-    NRunDB.fontscale = NRunDB.fontscale or 1
+    NRunDB.width = NRunDB.width or 207
+    NRunDB.height = 12
+	NRunDB.fontscale = NRunDB.fontscale or 1
     NRunDB.nonTargetOpacity = NRunDB.nonTargetOpacity or 0.7
     NRunDB.cooldownsEnabled = (NRunDB.cooldownsEnabled  == nil and true) or NRunDB.cooldownsEnabled
     NRunDB.spellTextEnabled = (NRunDB.spellTextEnabled == nil and true) or NRunDB.spellTextEnabled
     NRunDB.shortTextEnabled = (NRunDB.shortTextEnabled == nil and true) or NRunDB.shortTextEnabled
+    NRunDB.swapTarget = (NRunDB.swapTarget == nil and true) or NRunDB.swapTarget
     NRunDB.localNames   = (NRunDB.localNames == nil and false) or NRunDB.localNames
     NRunDB.CustomSpells = NRunDB.CustomSpells or {}
     for id,opts in pairs(NRunDB.CustomSpells) do
@@ -107,8 +108,8 @@ function NugRunning.PLAYER_LOGIN(self,event,arg1)
 end
 
 function NugRunning.COMBAT_LOG_EVENT_UNFILTERED( self, event, timestamp, eventType, hideCaster,
-                srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName, spellSchool, auraType, amount)
-
+                srcGUID, srcName, srcFlags, --srcFlags2,
+                dstGUID, dstName, dstFlags, --dstFlags2,
     if NugRunningConfig[spellID] then
         local isSrcPlayer = (bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE)
         local opts = NugRunningConfig[spellID]
@@ -229,7 +230,7 @@ function NugRunning.ActivateTimer(self,srcGUID,dstGUID,dstName,dstFlags, spellID
     
     if not opts.color then
     if timerType == "DEBUFF" then opts.color = { 0.8, 0.1, 0.7}
-    else opts.color = { 1, 0.4, 0.2} end
+    else opts.color = { 0.8, 0.8, 0.8} end
     end
     timer:SetColor(unpack(opts.color))
     if timer.glow:IsPlaying() then timer.glow:Stop() end
@@ -256,7 +257,7 @@ function NugRunning.RefreshTimer(self,srcGUID,dstGUID,dstName,dstFlags, spellID,
         timer.isGhost = nil
         if not opts.color then
         if timerType == "DEBUFF" then opts.color = { 0.8, 0.1, 0.7}
-        else opts.color = { 1, 0.4, 0.2} end
+        else opts.color = { 0.8, 0.8, 0.8} end
         end
         timer:SetColor(unpack(opts.color))
     end
@@ -424,11 +425,13 @@ local point
 local to
 local ySign
 local nonTargetOpacity
+local doswap
 function NugRunning.SetupArrange(self)
     point = ( NRunDB.growth == "down" and "TOPLEFT" ) or "BOTTOMLEFT"
     to = ( NRunDB.growth == "down" and "BOTTOMLEFT" ) or "TOPLEFT"
     ySign = ( NRunDB.growth == "down" and -1 ) or 1
     nonTargetOpacity = NRunDB.nonTargetOpacity
+    doswap = NRunDB.swapTarget
 end
 local playerTimers = {}
 local targetTimers = {}
@@ -454,7 +457,7 @@ function NugRunning.ArrangeTimers(self)
         if timer.opts.group then
             sorted[timer.opts.group] = sorted[timer.opts.group] or {}
             table.insert(sorted[timer.opts.group],timer)
-        elseif timer.dstGUID == targetGUID then table.insert(targetTimers,timer)
+        elseif doswap and timer.dstGUID == targetGUID then table.insert(targetTimers,timer)
         elseif timer.dstGUID == playerGUID then table.insert(playerTimers,timer)
         elseif timer.dstGUID == nil then
             if timer.timerType == "BUFF" then
@@ -496,8 +499,9 @@ function NugRunning.ArrangeTimers(self)
 
     for target in pairs(sorted) do
             for i,timer in ipairs(sorted[target]) do
+                local newalpha = (timer.dstGUID == targetGUID) and 1 or nonTargetOpacity
                 if timer.timerType == "DEBUFF" then
-                    timer:SetAlpha(nonTargetOpacity)
+                    timer:SetAlpha(newalpha)
                 else
                     timer:SetAlpha(1)
                 end
@@ -570,6 +574,7 @@ function NugRunning.SlashCmd(msg)
       |cff00ff00/nrun cooldowns|r : toggle showing cooldowns
       |cff00ff00/nrun spelltext|r : toggle spell text on bars
       |cff00ff00/nrun shorttext|r : toggle using short names
+      |cff00ff00/nrun swaptarget|r : static order of target debuffs
       |cff00ff00/nrun localnames|r: toggle localized spell names
       |cff00ff00/nrun set|r width=120 height=20 fontscale=1.1 growth=up/down nontargetopacity=0.7: W & H of timers
       |cff00ff00/nrun setpos|r point=CENTER parent=UIParent to=CENTER x=0 y=0]]
@@ -621,7 +626,7 @@ function NugRunning.SlashCmd(msg)
         if NRunDB_Global.charspec[user] then NRunDB_Global.charspec[user] = nil
         else NRunDB_Global.charspec[user] = true
         end
-        print ("NRun: "..(NRunDB_Global.charspec[user] and "Enabled" or "Disabled").." character specific options for this toon. Will take effect after ui reload",0.7,1,0.7)
+        print ("NRun: "..(NRunDB_Global.charspec[user] and "Enabled" or "Disabled").." character specific options for this toon. Will take effect after ui reload")
     end
     if k == "cooldowns" then
         if NRunDB.cooldownsEnabled then
@@ -633,22 +638,27 @@ function NugRunning.SlashCmd(msg)
     end
     if k == "spelltext" then
         NRunDB.spellTextEnabled = not NRunDB.spellTextEnabled
-        print("NRun spell text "..(NRunDB.spellTextEnabled and "enabled" or "disabled"),0.7,0.7,1)
+        print("NRun spell text "..(NRunDB.spellTextEnabled and "enabled" or "disabled"))
     end
     if k == "shorttext" then
         NRunDB.shortTextEnabled = not NRunDB.shortTextEnabled
-        print("NRun short spell text "..(NRunDB.shortTextEnabled and "enabled" or "disabled"),0.7,0.7,1)
+        print("NRun short spell text "..(NRunDB.shortTextEnabled and "enabled" or "disabled"))
     end
     if k == "localnames" then
         NRunDB.localNames = not NRunDB.localNames
-        print("NRun localized spell names "..(NRunDB.localNames and "enabled" or "disabled"),0.7,0.7,1)
+        print("NRun localized spell names "..(NRunDB.localNames and "enabled" or "disabled"))
+    end
+    if k == "swaptarget" then
+        NRunDB.swapTarget = not NRunDB.swapTarget
+        NugRunning:SetupArrange()
+        print("Target swapping turned "..(NRunDB.swapTarget and "on" or "off"))
     end
     if k == "set" then
         local p = ParseOpts(v)
         NRunDB.width = p["width"] or NRunDB.width
         NRunDB.height = p["height"] or NRunDB.height
         NRunDB.growth = p["growth"] or NRunDB.growth
-        NRunDB.fontscale = p["fontscale"] or NRunDB.fontscale
+		NRunDB.fontscale = p["fontscale"] or NRunDB.fontscale
         --NRunDB.fontsize = p["fontsize"] or NRunDB.fonsize
         NRunDB.nonTargetOpacity = p["nontargetopacity"] or NRunDB.nonTargetOpacity
         for i,timer in ipairs(alltimers) do
@@ -698,7 +708,8 @@ function NugRunning.SlashCmd(msg)
         NugRunning.debug = CreateFrame("Frame")
         NugRunning.debug:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
         NugRunning.debug:SetScript("OnEvent",function( self, event, timestamp, eventType, hideCaster, 
-                                                        srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags,
+                                                        srcGUID, srcName, srcFlags, --srcFlags2,
+                                                        dstGUID, dstName, dstFlags, --dstFlags2,
                                                         spellID, spellName, spellSchool, auraType, amount)
             local isSrcPlayer = (bit_band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) == COMBATLOG_OBJECT_AFFILIATION_MINE)
             if isSrcPlayer then print (spellID, spellName, eventType) end
